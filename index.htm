@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field-Effect Transistors & Transistor Fundamentals Exam</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #0f172a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #334155;
+            --correct: #16a34a;
+            --incorrect: #dc2626;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .exam-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #eff6ff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .question-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .question-card:hover {
+            border-color: var(--primary-light);
+        }
+
+        .question-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .options-list {
+            list-style: none;
+        }
+
+        .option-item {
+            margin-bottom: 10px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .option-label:hover {
+            background-color: #f1f5f9;
+        }
+
+        .option-label input {
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .feedback {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .feedback.correct {
+            display: block;
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .feedback.incorrect {
+            display: block;
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-reset {
+            background-color: #e2e8f0;
+            color: var(--text);
+        }
+
+        .btn-reset:hover {
+            background-color: #cbd5e1;
+        }
+
+        #results-panel {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        #results-panel h2 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .score-display {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        @media (max-width: 600px) {
+            .exam-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Field-Effect Transistors & Circuit Theory Exam</h1>
+        <p class="subtitle">Interactive Assessment based on Electronic Devices & Circuit Theory (Boylestad)</p>
+    </header>
+
+    <div class="exam-info">
+        <div>Total Questions: <span id="total-q">50</span></div>
+        <div>Type: Multiple Choice</div>
+    </div>
+
+    <div id="results-panel">
+        <h2>Exam Results</h2>
+        <div class="score-display"><span id="score">0</span> / 50</div>
+        <p id="score-percentage" style="margin-top: 5px; font-weight: 600;"></p>
+    </div>
+
+    <form id="quiz-form">
+        <div id="questions-container"></div>
+
+        <div class="controls">
+            <button type="button" class="btn-reset" onclick="resetQuiz()">Reset Answers</button>
+            <button type="submit" class="btn-submit">Submit Exam</button>
+        </div>
+    </form>
+</div>
+
+<script>
+const examQuestions = [
+    {
+        q: "1. Which of the following describes a primary operational difference between FETs and BJTs?",
+        options: ["FETs are current-controlled; BJTs are voltage-controlled.", "FETs are voltage-controlled; BJTs are current-controlled.", "FETs have lower input impedance than BJTs.", "FETs are more sensitive to temperature variations than BJTs."],
+        answer: 1,
+        explanation: "FETs are voltage-controlled devices, whereas BJTs are current-controlled devices."
+    },
+    {
+        q: "2. Compared to BJTs, FETs generally have:",
+        options: ["Higher gain", "Lower input impedance", "Higher input impedance", "Greater sensitivity to temperature variations"],
+        answer: 2,
+        explanation: "FETs feature a much higher input impedance compared to BJTs."
+    },
+    {
+        q: "3. What are the two basic structural types of JFETs?",
+        options: ["P-channel and N-channel", "Enhancement and Depletion", "Bipolar and Unipolar", "Ohmic and Saturation"],
+        answer: 0,
+        explanation: "JFETs come in two construction types: n-channel and p-channel."
+    },
+    {
+        q: "4. In an n-channel JFET, the Drain and Source terminals are connected directly to the:",
+        options: ["p-type material", "n-channel", "Insulating SiO2 layer", "Substrate terminal"],
+        answer: 1,
+        explanation: "In an n-channel JFET, the Drain and Source terminals connect to the n-channel."
+    },
+    {
+        q: "5. In the water spigot analogy for JFET operation, the Gate voltage corresponds to the:",
+        options: ["Accumulation of electrons", "Holes at the positive pole", "Control valve/spigot handle adjusting water flow", "Pressure source"],
+        answer: 2,
+        explanation: "The Gate controls channel width and charge flow, analogous to a spigot controlling water flow."
+    },
+    {
+        q: "6. When VGS = 0 V and VDS is increased from 0 V to a small positive value in an n-channel JFET, what happens to the depletion region?",
+        options: ["It decreases in size.", "It increases in size, narrowing the channel.", "It remains completely unchanged.", "It expands to conduct current through the p-gate."],
+        answer: 1,
+        explanation: "Increasing VDS causes the reverse bias on the p-n junction to grow, expanding the depletion region and narrowing the n-channel."
+    },
+    {
+        q: "7. The drain voltage VDS at which the n-channel is pinched off completely (for VGS = 0 V) is called the:",
+        options: ["Threshold voltage (VT)", "Breakdown voltage", "Pinch-off voltage (VP)", "Cutoff voltage (VGS(off))"],
+        answer: 2,
+        explanation: "The level of VDS where pinch-off occurs when VGS = 0 V is designated as VP."
+    },
+    {
+        q: "8. At saturation level in a JFET (when VGS = 0 V and VDS >= VP), the drain current ID is denoted as:",
+        options: ["IDSS", "ICBO", "ID(ON)", "IS"],
+        answer: 0,
+        explanation: "The maximum saturation drain current when VGS = 0 V is defined as IDSS."
+    },
+    {
+        q: "9. For an n-channel JFET, as VGS becomes more negative, the drain current ID:",
+        options: ["Increases above IDSS", "Decreases", "Remains constant at IDSS", "Increases exponentially"],
+        answer: 1,
+        explanation: "Applying a more negative VGS expands the depletion region, reducing channel conductivity and decreasing ID."
+    },
+    {
+        q: "10. The value of negative VGS that completely turns off an n-channel JFET (where ID = 0 A) is known as:",
+        options: ["VGS(Th)", "VP or VGS(off)", "VDSsat", "VBR"],
+        answer: 1,
+        explanation: "The gate-to-source voltage at which ID drops to 0 A is called VGS(off) or VP."
+    },
+    {
+        q: "11. The region of JFET operation to the left of the pinch-off point, where the FET can act as a variable resistor, is called the:",
+        options: ["Saturation region", "Ohmic region", "Breakdown region", "Active region"],
+        answer: 1,
+        explanation: "The region to the left of pinch-off is called the ohmic region, where the FET behaves as a voltage-controlled resistor."
+    },
+    {
+        q: "12. How do voltage polarities and current directions in a p-channel JFET compare to an n-channel JFET?",
+        options: ["They are identical.", "They are completely reversed.", "Voltage polarities are reversed, but current directions remain identical.", "Current directions are reversed, but voltage polarities remain identical."],
+        answer: 1,
+        explanation: "p-channel JFETs behave identically to n-channel JFETs except all voltage polarities and current directions are reversed."
+    },
+    {
+        q: "13. Shockley's equation for calculating JFET drain current ID is:",
+        options: ["ID = IDSS (1 - VGS / VP)^2", "ID = k (VGS - VT)^2", "ID = beta * IB", "ID = alpha * IE"],
+        answer: 0,
+        explanation: "Shockley's equation relates ID to VGS using ID = IDSS (1 - VGS / VP)^2."
+    },
+    {
+        q: "14. If VGS = VP in Shockley's equation, the resulting drain current ID will be:",
+        options: ["Equal to IDSS", "Equal to IDSS / 2", "0 A", "Equal to IDSS / 4"],
+        answer: 2,
+        explanation: "When VGS = VP, (1 - VP/VP) = 0, so ID = 0 A."
+    },
+    {
+        q: "15. In a D-MOSFET (Depletion-Type MOSFET), the gate terminal is electrically insulated from the channel by a thin layer of:",
+        options: ["Silicon Nitride", "Silicon Dioxide (SiO2)", "Gallium Arsenide", "Aluminum Oxide"],
+        answer: 1,
+        explanation: "The gate terminal in a MOSFET is insulated from the channel by a thin layer of silicon dioxide (SiO2)."
+    },
+    {
+        q: "16. A Depletion-Type MOSFET can operate in which two modes?",
+        options: ["Linear mode and Saturation mode", "Depletion mode and Enhancement mode", "Active mode and Cutoff mode", "Forward mode and Reverse mode"],
+        answer: 1,
+        explanation: "D-MOSFETs can operate in both depletion mode (VGS negative) and enhancement mode (VGS positive)."
+    },
+    {
+        q: "17. When an n-channel D-MOSFET operates in Enhancement Mode (VGS > 0 V), the drain current ID:",
+        options: ["Is equal to zero", "Increases above IDSS", "Decreases below IDSS", "Stays constant at IDSS"],
+        answer: 1,
+        explanation: "In enhancement mode (VGS positive for n-channel), additional free electrons are attracted into the channel, increasing ID above IDSS."
+    },
+    {
+        q: "18. Which statement is true regarding the structural difference between E-MOSFETs and D-MOSFETs?",
+        options: ["E-MOSFETs have a built-in channel; D-MOSFETs do not.", "E-MOSFETs do not have a built-in channel; D-MOSFETs have a physical channel.", "D-MOSFETs have no insulated gate.", "E-MOSFETs cannot operate with positive gate voltages."],
+        answer: 1,
+        explanation: "E-MOSFETs lack a physical, built-in channel, whereas D-MOSFETs possess a constructed physical channel."
+    },
+    {
+        q: "19. An Enhancement-Type MOSFET (E-MOSFET) begins conducting significant drain current when VGS exceeds the:",
+        options: ["Pinch-off voltage (VP)", "Threshold voltage (VT or VGS(Th))", "Breakdown voltage", "Reverse voltage"],
+        answer: 1,
+        explanation: "An E-MOSFET turns on when VGS reaches and exceeds the threshold voltage, VT or VGS(Th)."
+    },
+    {
+        q: "20. The equation used to calculate drain current ID in an E-MOSFET is:",
+        options: ["ID = IDSS (1 - VGS / VP)^2", "ID = k (VGS - VT)^2", "ID = beta * IB", "ID = IDSS / 2"],
+        answer: 1,
+        explanation: "In an E-MOSFET, the drain current transfer characteristic is defined by ID = k(VGS - VT)^2."
+    },
+    {
+        q: "21. Why are MOSFETs particularly sensitive to damage during handling?",
+        options: ["They have very large metallic junctions.", "The extremely thin SiO2 layer is vulnerable to electrostatic discharge (ESD).", "They operate at extremely low temperatures.", "Their p-n junctions break down under small forward currents."],
+        answer: 1,
+        explanation: "The extremely thin SiO2 dielectric layer under the gate can easily be ruptured by static charges."
+    },
+    {
+        q: "22. Which FET feature allows VMOS (Vertical MOSFET) devices to handle higher currents and power?",
+        options: ["A planar thin-film substrate", "A vertical structure providing more surface area to dissipate heat and reduced channel resistance", "Elimination of the drain connection", "Use of a single p-type layer"],
+        answer: 1,
+        explanation: "VMOS constructs channels vertically, giving a wider channel area that reduces resistance and handles high power/current."
+    },
+    {
+        q: "23. CMOS technology is constructed using:",
+        options: ["Only n-channel JFETs", "Complementary pairs of p-channel and n-channel MOSFETs on the same substrate", "Two identical BJTs connected in parallel", "High-power VMOS transistors"],
+        answer: 1,
+        explanation: "CMOS (Complementary MOSFET) integrates p-channel and n-channel MOSFETs on a single substrate."
+    },
+    {
+        q: "24. A key operational advantage of CMOS circuits is:",
+        options: ["High power dissipation", "Lower operating speed", "Extremely low operating power levels and high input impedance", "Low input impedance"],
+        answer: 2,
+        explanation: "CMOS technology is widely chosen for logic design because of its fast switching, high input impedance, and minimal power consumption."
+    },
+    {
+        q: "25. In the AC small-signal re model for a transistor, the parameter re is defined as:",
+        options: ["26 mV / IE", "26 mV / IB", "VT / IC", "VCE / IC"],
+        answer: 0,
+        explanation: "The dynamic emitter resistance re in the small-signal model is evaluated as re = 26 mV / IE."
+    },
+    {
+        q: "26. Which transistor configuration provides the highest power gain?",
+        options: ["Common Base (CB)", "Common Collector (CC)", "Common Emitter (CE)", "Emitter Follower"],
+        answer: 2,
+        explanation: "The Common Emitter (CE) configuration provides the highest overall power gain among BJT configurations."
+    },
+    {
+        q: "27. The Common Collector configuration is also commonly referred to as a(n):",
+        options: ["Collector follower", "Emitter follower", "Base follower", "Voltage amplifier"],
+        answer: 1,
+        explanation: "The Common Collector circuit is widely known as an Emitter Follower because the output voltage follows the input voltage."
+    },
+    {
+        q: "28. What is a primary application of the Emitter Follower (Common Collector) configuration?",
+        options: ["High voltage amplification", "Impedance matching", "Phase inversion of 180 degrees", "RF frequency tuning"],
+        answer: 1,
+        explanation: "The Common Collector has high input impedance and low output impedance, making it ideal for impedance matching/buffer applications."
+    },
+    {
+        q: "29. What is the phase shift between the input and output signal in a Common Emitter amplifier?",
+        options: ["0 degrees", "90 degrees", "180 degrees", "360 degrees"],
+        answer: 2,
+        explanation: "The Common Emitter amplifier introduces a 180-degree phase shift between the input signal and the output signal."
+    },
+    {
+        q: "30. The ratio of collector current to base current in a BJT (IC / IB) is represented by:",
+        options: ["Alpha (alpha)", "Beta (beta)", "Gamma (gamma)", "Delta (delta)"],
+        answer: 1,
+        explanation: "Beta (beta) is defined as the ratio of collector current to base current (IC / IB)."
+    },
+    {
+        q: "31. The parameter Alpha (alpha) represents the ratio of:",
+        options: ["IC / IB", "IC / IE", "IB / IE", "IE / IC"],
+        answer: 1,
+        explanation: "Alpha (alpha) expresses the relationship between collector current IC and emitter current IE (IC / IE)."
+    },
+    {
+        q: "32. For practical BJTs, the value of Alpha (alpha) is ideally 1 and typically ranges between:",
+        options: ["0.1 and 0.5", "0.5 and 0.8", "0.9 and 0.998", "1.1 and 2.0"],
+        answer: 2,
+        explanation: "In real transistors, alpha ranges closely to unity, between 0.9 and 0.998."
+    },
+    {
+        q: "33. What is the relation between Beta and Alpha?",
+        options: ["Beta = Alpha / (1 - Alpha)", "Beta = Alpha / (1 + Alpha)", "Alpha = Beta / (Beta - 1)", "Beta = (1 - Alpha) / Alpha"],
+        answer: 0,
+        explanation: "The mathematical conversion from alpha to beta is Beta = Alpha / (1 - Alpha)."
+    },
+    {
+        q: "34. Which BJT region is heavily doped to supply charge carriers?",
+        options: ["Base", "Collector", "Emitter", "Substrate"],
+        answer: 2,
+        explanation: "The Emitter terminal is heavily doped (~10^19 dopants/cm^3) to inject charge carriers into the base."
+    },
+    {
+        q: "35. Which BJT region is lightly doped and physically very thin?",
+        options: ["Collector", "Base", "Emitter", "Gate"],
+        answer: 1,
+        explanation: "The Base region is thin and lightly doped (~10^17 dopants/cm^3) to allow most carriers to pass through to the collector."
+    },
+    {
+        q: "36. For a BJT to operate in the Active (Linear) Region, how must its junctions be biased?",
+        options: ["Base-Emitter forward biased, Base-Collector forward biased", "Base-Emitter reverse biased, Base-Collector reverse biased", "Base-Emitter forward biased, Base-Collector reverse biased", "Base-Emitter reverse biased, Base-Collector forward biased"],
+        answer: 2,
+        explanation: "In active linear operation, the base-emitter junction is forward biased and the base-collector junction is reverse biased."
+    },
+    {
+        q: "37. When both base-emitter and base-collector junctions of a BJT are forward biased, the BJT is operating in the:",
+        options: ["Active region", "Cutoff region", "Saturation region", "Breakdown region"],
+        answer: 2,
+        explanation: "When both BJT p-n junctions are forward-biased, the device operates in saturation (acting as a closed switch)."
+    },
+    {
+        q: "38. When both base-emitter and base-collector junctions of a BJT are reverse biased, the BJT is in:",
+        options: ["Saturation region", "Cutoff region", "Active region", "Ohmic region"],
+        answer: 1,
+        explanation: "When both p-n junctions are reverse-biased, zero/negligible current flows, placing the BJT in cutoff."
+    },
+    {
+        q: "39. Which BJT biasing arrangement provides the most stable operating point against variations in Beta and temperature?",
+        options: ["Fixed-bias circuit", "Voltage-divider bias circuit", "Base-bias circuit", "Collector-feedback without emitter resistor"],
+        answer: 1,
+        explanation: "Voltage-divider bias is the most stable BJT biasing method because its Q-point can be rendered essentially independent of Beta."
+    },
+    {
+        q: "40. In an AC small-signal analysis of a transistor circuit, DC supply sources are replaced by:",
+        options: ["Open circuits", "Short circuits / ground connections", "Equivalent inductors", "High resistors"],
+        answer: 1,
+        explanation: "When performing small-signal AC analysis, ideal DC voltage sources are set to zero and replaced by short circuits (ground)."
+    },
+    {
+        q: "41. In small-signal transistor equivalent circuits, coupling and bypass capacitors are ideally treated as:",
+        options: ["Open circuits", "Short circuits", "Variable inductors", "Current sources"],
+        answer: 1,
+        explanation: "At operating AC frequencies, coupling and bypass capacitors have minimal reactance and are modeled as short circuits."
+    },
+    {
+        q: "42. The hybrid parameter hfe corresponds to which AC parameter in BJT small-signal analysis?",
+        options: ["Beta AC (beta_ac)", "re", "Alpha DC", "hoe"],
+        answer: 0,
+        explanation: "The hybrid parameter hfe represents the short-circuit forward transfer current ratio, equivalent to beta_ac."
+    },
+    {
+        q: "43. The hybrid parameter hie represents:",
+        options: ["Open-circuit output admittance", "Short-circuit input impedance (Beta * re)", "Reverse transfer voltage ratio", "Forward current gain"],
+        answer: 1,
+        explanation: "hie corresponds to the BJT short-circuit input impedance, equal to beta * re."
+    },
+    {
+        q: "44. The reciprocal of hoe (1 / hoe) gives the BJT small-signal:",
+        options: ["Transconductance (gm)", "Output resistance (ro)", "Input resistance (re)", "Amplification factor (beta)"],
+        answer: 1,
+        explanation: "The output resistance ro is calculated as the inverse of output admittance hoe (ro = 1 / hoe)."
+    },
+    {
+        q: "45. If the DC emitter current IE in a transistor amplifier is 2.5 mA, the value of re is approximately:",
+        options: ["10.4 ohms", "100 ohms", "2.5 ohms", "26 ohms"],
+        answer: 0,
+        explanation: "re = 26 mV / IE = 26 mV / 2.5 mA = 10.4 ohms."
+    },
+    {
+        q: "46. What type of device is a Field-Effect Transistor (FET) classified as?",
+        options: ["Bipolar device", "Unipolar device", "Tri-polar device", "Non-polar device"],
+        answer: 1,
+        explanation: "FETs are unipolar devices because current flow relies solely on majority charge carriers (electrons or holes)."
+    },
+    {
+        q: "47. A bypass capacitor is used in a transistor amplifier circuit to:",
+        options: ["Block DC signals from reaching the output", "Establish an AC ground at a specific node/terminal", "Increase the DC bias voltage", "Decrease total input impedance"],
+        answer: 1,
+        explanation: "Bypass capacitors provide a low-impedance path to ground for AC signals across a resistor, effectively grounding that node for AC."
+    },
+    {
+        q: "48. In an NPN transistor, current flow during normal operation consists of electrons moving from:",
+        options: ["Base to Collector", "Collector to Emitter", "Emitter to Collector", "Gate to Source"],
+        answer: 2,
+        explanation: "Electrons are emitted from the emitter and collected by the collector terminal."
+    },
+    {
+        q: "49. What happens to the Q-point load line of a BJT when it operates in cutoff?",
+        options: ["VCE reaches VCC and IC = 0 A", "VCE = 0 V and IC is maximum", "IC equals IB", "VCE equals 0.7 V"],
+        answer: 0,
+        explanation: "In cutoff, the transistor is an open switch: IC drops to 0 A and VCE rises to the supply level VCC."
+    },
+    {
+        q: "50. When a transistor is fully turned ON in saturation, VCE(sat) for a silicon transistor is approximately:",
+        options: ["0.2 V to 0.3 V", "0.7 V", "Equal to VCC", "12 V"],
+        answer: 0,
+        explanation: "In saturation, the voltage drop across collector-emitter VCE(sat) drops to a tiny value, typically 0.2 V to 0.3 V."
+    }
+];
+
+function renderQuiz() {
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+
+    examQuestions.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `q-card-${index}`;
+
+        const qTitle = document.createElement('div');
+        qTitle.className = 'question-title';
+        qTitle.textContent = item.q;
+        card.appendChild(qTitle);
+
+        const optionsList = document.createElement('ul');
+        optionsList.className = 'options-list';
+
+        item.options.forEach((opt, optIdx) => {
+            const li = document.createElement('li');
+            li.className = 'option-item';
+
+            const label = document.createElement('label');
+            label.className = 'option-label';
+
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = `question-${index}`;
+            radio.value = optIdx;
+
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(opt));
+            li.appendChild(label);
+            optionsList.appendChild(li);
+        });
+
+        card.appendChild(optionsList);
+
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        feedback.id = `feedback-${index}`;
+        card.appendChild(feedback);
+
+        container.appendChild(card);
+    });
+}
+
+document.getElementById('quiz-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    let score = 0;
+
+    examQuestions.forEach((item, index) => {
+        const selected = document.querySelector(`input[name="question-${index}"]:checked`);
+        const feedbackEl = document.getElementById(`feedback-${index}`);
+
+        if (selected) {
+            const userAns = parseInt(selected.value);
+            if (userAns === item.answer) {
+                score++;
+                feedbackEl.className = 'feedback correct';
+                feedbackEl.innerHTML = `<strong>Correct!</strong> ${item.explanation}`;
+            } else {
+                feedbackEl.className = 'feedback incorrect';
+                feedbackEl.innerHTML = `<strong>Incorrect.</strong> Correct answer: <em>${item.options[item.answer]}</em>.<br>${item.explanation}`;
+            }
+        } else {
+            feedbackEl.className = 'feedback incorrect';
+            feedbackEl.innerHTML = `<strong>Not Answered.</strong> Correct answer: <em>${item.options[item.answer]}</em>.<br>${item.explanation}`;
+        }
+    });
+
+    const resultsPanel = document.getElementById('results-panel');
+    const scoreEl = document.getElementById('score');
+    const percentEl = document.getElementById('score-percentage');
+
+    scoreEl.textContent = score;
+    const percentage = ((score / examQuestions.length) * 100).toFixed(1);
+    percentEl.textContent = `Overall Score: ${percentage}%`;
+    resultsPanel.style.display = 'block';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+function resetQuiz() {
+    document.getElementById('quiz-form').reset();
+    document.getElementById('results-panel').style.display = 'none';
+    const feedbacks = document.querySelectorAll('.feedback');
+    feedbacks.forEach(f => {
+        f.className = 'feedback';
+        f.style.display = 'none';
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Initialize on page load
+window.onload = renderQuiz;
+</script>
+
+</body>
+</html>
